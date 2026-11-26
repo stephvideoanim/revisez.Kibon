@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Révisez vos Kibon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Montserrat:wght@600;800&display=swap" rel="stylesheet">
+<style>
+/* VOICE: énergique et clair, comme un tirage au dojang
+   IDEA: le paquet de cartes Kibon du CSDGE, tiré une carte à la fois
+   PICTURE: la carte elle-même, grande, au centre, qui se retourne
+   COLOUR and TYPE: marine des cartes, bandeaux jaune/vert/bleu de catégorie, rouge vif pour l'action ; Oswald condensé + Montserrat
+   LAYOUT: une colonne centrée : progression, carte, bouton */
+:root{color-scheme:light dark;
+  --bg:light-dark(#e9edf3,#050e1c);--ink:light-dark(#0b1a30,#eef2f8);--soft:light-dark(#4a5a72,#a9b6c9);
+  --panel:light-dark(#ffffff,#0c1d36);--line:light-dark(#cfd7e3,#1e3354);
+  --navy:#071a33;--navy2:#0d2747;--pos:#3a8ee6;--red:#d7263d;--red2:#b81d31;
+  --yellow:#ffde59;--green:#9ee35a;--blue:#5eb2e3}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Montserrat,system-ui,sans-serif;overflow-x:clip;min-height:100vh}
+.wrap{max-width:760px;margin:0 auto;padding:clamp(20px,4vw,44px) max(4vw,16px) 48px}
+h1{font:800 clamp(32px,6vw,48px)/1.05 Montserrat,sans-serif;margin:0 0 6px;text-wrap:balance;letter-spacing:-.01em}
+h1 b{color:var(--red)}
+h2{font:800 26px/1.15 Montserrat,sans-serif;margin:0 0 14px}
+.sub{color:var(--soft);margin:0 0 26px}
+.screen{display:none}.screen.on{display:block;animation:in .35s ease}
+@keyframes in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:clamp(18px,3vw,28px);margin-bottom:18px}
+.lbl{font-weight:800;font-size:15px;margin:0 0 10px}
+.dans{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.dan{appearance:none;border:2px solid var(--line);background:var(--bg);color:var(--ink);border-radius:14px;padding:18px 12px;cursor:pointer;font:700 30px/1 Oswald,sans-serif;text-align:center}
+.dan small{display:block;font:600 13px/1.3 Montserrat,sans-serif;color:var(--soft);margin-top:6px}
+.dan[aria-pressed=true]{border-color:var(--red);background:var(--navy);color:#fff}
+.dan[aria-pressed=true] small{color:#c9d5e6}
+.dan:focus-visible,.btn:focus-visible,.step button:focus-visible{outline:3px solid var(--pos);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:14px;justify-content:space-between}
+.step{display:flex;align-items:center;gap:6px}
+.step button{width:44px;height:44px;border-radius:12px;border:2px solid var(--line);background:var(--bg);color:var(--ink);font:700 22px/1 Oswald,sans-serif;cursor:pointer}
+.step output{width:48px;text-align:center;font:700 30px/1 Oswald,sans-serif}
+.btn{appearance:none;border:0;border-radius:14px;min-height:52px;padding:12px 26px;font:700 19px/1 Oswald,sans-serif;letter-spacing:.03em;cursor:pointer;background:var(--red);color:#fff;text-transform:uppercase}
+.btn:hover{background:var(--red2)}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.btn.ghost:hover{background:var(--panel)}
+.btn.wide{width:100%}
+.btn:disabled{opacity:.45;cursor:default}
+ol.rules{margin:0;padding:0;list-style:none;counter-reset:r}
+ol.rules li{counter-increment:r;position:relative;padding:0 0 14px 46px}
+ol.rules li::before{content:counter(r);position:absolute;left:0;top:-2px;width:32px;height:32px;border-radius:50%;background:var(--navy);color:#fff;font:700 17px/32px Oswald,sans-serif;text-align:center}
+.chip{display:inline-block;padding:1px 9px;border-radius:6px;font:600 14px/1.6 Oswald,sans-serif;letter-spacing:.02em;vertical-align:1px}
+.chip.c{color:var(--navy)}
+.chip.p{background:var(--navy);color:var(--pos)}.chip.t{background:var(--navy);color:#fff}
+.cats{display:grid;gap:8px;margin:8px 0 4px}
+.cats div{display:flex;gap:10px;align-items:center;font-size:14px;font-weight:600}
+.cats i{flex:none;width:30px;height:22px;border-radius:5px;font:700 14px/22px Oswald,sans-serif;text-align:center;font-style:normal;color:var(--navy)}
+/* jeu */
+.top{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;justify-content:space-between;margin-bottom:14px}
+.who{font:700 28px/1.1 Oswald,sans-serif;text-transform:uppercase}
+.meta{color:var(--soft);font-size:14px;font-weight:600}
+.track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:6px;margin-bottom:22px}
+.track span{height:10px;border-radius:5px;background:var(--line);position:relative}
+.track span.done{background:var(--c)}
+.track span.now{background:var(--c);box-shadow:0 0 0 3px var(--bg),0 0 0 5px var(--c)}
+.stage{perspective:1400px;display:flex;justify-content:center;margin-bottom:22px}
+.card{position:relative;width:min(100%,400px);aspect-ratio:400/590;transform-style:preserve-3d;transition:transform .6s cubic-bezier(.3,.7,.2,1)}
+.card.up{transform:rotateY(180deg)}
+.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;overflow:hidden;box-shadow:0 18px 40px -16px rgba(3,12,26,.55),0 2px 0 rgba(255,255,255,.06) inset}
+.back{background:repeating-linear-gradient(135deg,#0b223f 0 14px,#081a32 14px 28px);display:grid;place-items:center;border:6px solid #fff}
+.back .mark{text-align:center;color:#fff}
+.back .ring{width:120px;height:120px;border-radius:50%;margin:0 auto 18px;background:conic-gradient(from 90deg,var(--red) 0 50%,#1f5fb0 50% 100%);border:5px solid #fff;box-shadow:0 0 0 6px rgba(255,255,255,.12)}
+.back .k{font:700 44px/1 Oswald,sans-serif;letter-spacing:.08em}
+.back .d{font:600 15px/1.4 Montserrat,sans-serif;color:#c3d0e3;margin-top:8px}
+.front{transform:rotateY(180deg);background:var(--navy);display:flex;flex-direction:column;border:6px solid #fff}
+.head{background:var(--c);color:#111;text-align:center;padding:12px 10px 12px;border-bottom:2px solid #000}
+.head b{display:block;font:800 13px/1.3 Montserrat,sans-serif;margin-bottom:5px}
+.head span{font:600 13px/1.3 Montserrat,sans-serif}
+.body{flex:1;padding:18px 18px 10px;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(120% 70% at 80% 0%,#12305a 0,transparent 60%),var(--navy)}
+.title{align-self:center;background:#fff;color:var(--navy);font:800 clamp(15px,4.6vw,21px)/1.15 Montserrat,sans-serif;padding:6px 10px;margin-bottom:18px;text-align:center}
+.title.small{font-size:clamp(13px,3.6vw,15px)}
+.items{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.items li{display:flex;align-items:center;gap:12px}
+.items li::before{content:"";flex:none;width:9px;height:9px;background:#e7ecf3}
+.items span{flex:1;border:1.5px solid #8ea3c2;border-radius:4px;padding:5px 10px;font:600 clamp(15px,4.2vw,19px)/1.2 Oswald,sans-serif;color:#fff;letter-spacing:.01em;background:rgba(0,0,0,.18)}
+.items li.p span{color:var(--pos)}
+.foot{background:linear-gradient(180deg,#bfc4cc,#e6e8eb);color:#111;text-align:center;font:700 14px/1 Oswald,sans-serif;padding:14px 0;letter-spacing:.03em}
+.actions{display:grid;gap:10px;max-width:400px;margin:0 auto}
+.hint{text-align:center;color:var(--soft);font-size:13px;margin:8px 0 0}
+.done-list{list-style:none;padding:0;margin:0 0 18px;display:grid;gap:8px}
+.done-list li{display:flex;justify-content:space-between;gap:10px;padding:10px 14px;border-radius:12px;background:var(--panel);border:1px solid var(--line);font-weight:600}
+.done-list i{font-style:normal;font:700 16px/1.4 Oswald,sans-serif}
+.bar{display:flex;gap:10px;justify-content:flex-end;margin-bottom:6px}
+.bar .btn{min-height:44px;font-size:15px;padding:8px 14px}
+@media(max-width:600px){.who{font-size:24px}.back .ring{width:90px;height:90px}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}.screen.on{animation:none}}
+</style>
+</head>
+<body>
+<main class="wrap">
+
+<!-- ACCUEIL -->
+<section id="s-home" class="screen on">
+  <h1>Révisez vos <b>Kibon</b></h1>
+  <p class="sub">Module A — tirage au sort des enchaînements, catégorie par catégorie.</p>
+  <div class="panel">
+    <p class="lbl">Quel DAN préparez-vous ?</p>
+    <div class="dans">
+      <button class="dan" data-dan="1" aria-pressed="true">1<sup>er</sup> DAN<small>24 cartes</small></button>
+      <button class="dan" data-dan="2" aria-pressed="false">2<sup>e</sup> DAN<small>24 cartes</small></button>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="row">
+      <p class="lbl" style="margin:0">Nombre de joueurs</p>
+      <div class="step">
+        <button id="minus" aria-label="Un joueur de moins">−</button>
+        <output id="nb">1</output>
+        <button id="plus" aria-label="Un joueur de plus">+</button>
+      </div>
+    </div>
+  </div>
+  <button class="btn wide" id="go-rules">Continuer</button>
+</section>
+
+<!-- RÈGLES -->
+<section id="s-rules" class="screen">
+  <h2>Les règles</h2>
+  <div class="panel">
+    <ol class="rules">
+      <li>Chaque joueur tire <strong>6 cartes</strong> : <strong>2 cartes successives</strong> dans chacune des 3 catégories, toujours dans cet ordre :
+        <div class="cats" id="cats"></div>
+      </li>
+      <li>Retournez la carte, lisez l'enchaînement, puis exécutez-le en partant de <strong>TCHOUMBI SEUGUI</strong>.</li>
+      <li>Sur la carte, <span class="chip p">EN BLEU</span> les positions (ou la cible), <span class="chip t">EN BLANC</span> les techniques.</li>
+      <li>Une fois l'enchaînement réalisé, demandez la <strong>carte suivante</strong>.</li>
+      <li>Après sa 6<sup>e</sup> carte, le joueur passe la main au suivant. Une carte déjà tirée ne ressort pas tant que sa catégorie n'est pas épuisée.</li>
+    </ol>
+  </div>
+  <div class="actions">
+    <button class="btn wide" id="start">Commencer la partie</button>
+    <button class="btn ghost wide" id="back-home">Changer de DAN</button>
+  </div>
+</section>
+
+<!-- JEU -->
+<section id="s-game" class="screen">
+  <div class="bar"><button class="btn ghost" id="quit">Quitter</button></div>
+  <div class="top">
+    <div class="who" id="who">Joueur 1</div>
+    <div class="meta" id="meta">Carte 1 / 6</div>
+  </div>
+  <div class="track" id="track"></div>
+  <div class="stage">
+    <div class="card" id="card">
+      <div class="face back"><div class="mark"><div class="ring"></div><div class="k">KIBON</div><div class="d" id="back-d">1er DAN</div></div></div>
+      <div class="face front">
+        <div class="head"><b id="f-mod">MODULE A - KIBON - 1er DAN</b><span id="f-cat"></span></div>
+        <div class="body"><div class="title" id="f-title"></div><ul class="items" id="f-items"></ul></div>
+        <div class="foot">CSDGE FFTDA</div>
+      </div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="btn wide" id="act">Tirer la carte</button>
+    <p class="hint">Raccourci : barre d'espace</p>
+  </div>
+</section>
+
+<!-- FIN -->
+<section id="s-end" class="screen">
+  <h2 id="end-t">Bravo !</h2>
+  <p class="sub" id="end-s"></p>
+  <ul class="done-list" id="end-list"></ul>
+  <div class="actions">
+    <button class="btn wide" id="again">Rejouer</button>
+    <button class="btn ghost wide" id="home">Retour à l'accueil</button>
+  </div>
+</section>
+</main>
+
+<script>
+{
+// Données des cartes — "*" = position / cible (en bleu)
+const CATS = {
+ 1:[{name:"ENCHAINEMENT DES MEMBRES SUPERIEURS + POSITIONS",c:"var(--yellow)"},
+    {name:"ENCHAINEMENT MEMBRES INFERIEURS",c:"var(--green)"},
+    {name:"ENCHAINEMENT DES MEMBRES SUPERIEURS + INFÉRIEURS + POSITIONS",c:"var(--blue)"}],
+ 2:[{name:"ENCHAINEMENT DES MEMBRES SUPERIEURS + POSITIONS",c:"var(--blue)"},
+    {name:"ENCHAINEMENT MEMBRES INFERIEURS",c:"var(--green)"},
+    {name:"ENCHAINEMENT DES MEMBRES SUPERIEURS + INFERIEURS + POSITIONS",c:"var(--yellow)"}]
+};
+const SHORT=["Membres supérieurs + positions","Membres inférieurs","Supérieurs + inférieurs + positions"];
+const DECK = {
+ 1:[
+  [["*DWITT KOUBI SEUGUI","HAN SONNAL MOMTONG BAKKAT MAKI","*AP KOUBI SEUGUI","JEBIPOUM MOK TCHIGUI"],
+   ["*AP KOUBI SEUGUI","HAN SONNAL EULGOUL BITEURO MAKI","EULGOUL BANDE JILEUGUI"],
+   ["*JOUTCHOUM SEUGUI","HAN SONNAL MOMTONG YOP MAKI","MOMTOMG YOP JILEUGUI"],
+   ["*AP KOUBI SEUGUI","JEBIPOUM MOK TCHIGUI","DEUNG JOUMOK EULGOUL AP TCHIGUI"],
+   ["*DWITT KOUBI SEUGUI","KEUDEURO MOMTONG BAKKAT MAKI","*AP KOUBI SEUGUI","PALKOUP DOLYEU TCHIGUI"],
+   ["*AP KOUBI SEUGUI","MOMTONG HETCHEU MAKI","*DWITT KOA SEUGUI","DOU JOUMOK JETCHEU JILEUGUI"],
+   ["*DWITT KOUBI SEUGUI","SONAL ARE MAKI","*BEUM SEUGUI","BATANG SON MOMTONG MAKI"],
+   ["*DWITT KOUBI SEUGUI","MOMTONG BAKKAT MAKI","*AP KOUBI SEUGUI","ME JOUMOK NERYOCHIGUI"]],
+  [["NELYEU TCHAGUI","BANDAL TCHAGUI","DWITT TCHAGUI"],
+   ["YOP TCHAGUI","AP BAL FOURYEU TCHAGUI"],
+   ["TUYEU DOLYEU TCHAGUI","*(CIBLE : RAQUETTE)"],
+   ["Y OH DOLYEU TCHAGUI"],
+   ["SOKKOT TCHAGUI"],
+   ["AP BAL TUYEU AP TCHAGUI","*(CIBLE : RAQUETTE)"],
+   ["DOU BAL DANG SANG AP TCHAGUI"],
+   ["BANDAL TCHAGUI","MOM DOLYEU FOULYEU TCHAGUI"]],
+  [["*AP SEUGUI","HAN SONNAL JEBIPOUM MOK TCHIGUI","AP TCHAGUI","*AP KOUBI SEUGUI","PALKOUP DOLYEU TCHIGUI"],
+   ["*AP SEUGUI","DEUNG JOUMOK EULGOUL BAKKAT TCHIGUI","AP TCHAGUI","*AP KOUBI SEUGUI","MOMTONG BARO JILEUGUI"],
+   ["*DWITT KOUBI SEUGUI","HAN SONNAL MOMTONG BAKKAT MAKI","YOP TCHAGUI","*AP KOUBI SEUGUI","PALKOUP MOMTONG PYOJOK TCHIGUI"],
+   ["*DWITT KOUBI SEUGUI","SONNAL MOMTONG MAKI","DOLYEU TCHAGUI","*AP KOUBI SEUGUI","EULGOUL BAKKAT MAKI","MOMTONG BARO JILEUGUI"],
+   ["*AP KOUBI SEUGUI","HAN SONNAL EULGOUL BITEURO MAKI","DOLYEU TCHAGUI","MOMTONG BARO JILEUGUI"],
+   ["*AP KOUBI SEUGUI","OWE SAN TEUL MAKI","AP BAL YOP TCHAGUI","*AP KOUBI SEUGUI","JEBIPOUM MOK TCHIGUI"],
+   ["*BEUM SEUGUI","SONNAL MOMTONG MAKI","AP BAL AP TCHAGUI","*AP KOUBI SEUGUI","MOMTONG BARO JILEUGUI"],
+   ["*DWITT KOUBI SEUGUI","KEUDEURO ARE MAKI","AP TCHAGUI","*AP KOUBI SEUGUI","MOMTONG DOUBONN JILEUGUI"]]
+ ],
+ 2:[
+  [["*DWITT KOUBI SEUGUI","SONNAL MOMTONG MAKI","*AP KOUBI SEUGUI","PYON SON KEUT ARE JETCHEU TCHIREUGUI"],
+   ["*JOUTCHOUM SEUGUI","HAN SONNAL MOMTONG YOP MAKI","JOUMOK PJYOJOK JILEUGUI","*AP KOUBI SEUGUI","DEUNG JOUMOK EULGOUL BAKKAT TCHIGUI"],
+   ["*AP KOUBI SEUGUI","AN PALMOK MOMTONG HETCHEU MAKI","A GUI SON CALJAEBI"],
+   ["*DWITT KOUBI SEUGUI","HAN SONNAL MOMTONG BAKKAT MAKI","*AP KOUBI SEUGUI","PALKOUP PYOJOK TCHIGUI"],
+   ["*AP KOUBI SEUGUI","OWE SAN TEUL MAKI","*AP KOUBI SEUGUI","MOUROUP KOKKI"],
+   ["*AP SEUGUI","BATANG SON NOULO MAKI","*JOUTCHOUM SEUGUI","PALKOUP YOP TCHIGUI"],
+   ["*AP KOUBI SEUGUI","MOMTONG HETCHEU MAKI","*AP KOUBI SEUGUI","PYON SONKEUT SEWO TCHILEUGUI"],
+   ["*AP KOUBI SEUGUI","JEBIPOUM MOK TCHIGUI","MOUROUP KOKKI"]],
+  [["BANDAL TCHAGUI","DWITT TCHAGUI"],
+   ["AP BAL YOP TCHAGUI","AP BAL FOULYEU TCHAGUI","TUYEU DOLYEU TCHAGUI"],
+   ["TUYEU DWITT TCHAGUI","*(CIBLE : RAQUETTE)"],
+   ["KEUDEUP DOLYEU TCHAGUI","AP BAL FOULYEU TCHAGUI"],
+   ["SOKKOT TCHAGUI"],
+   ["TUYEU MOM DOLYEU FOULYEU TCHAGUI","*(CIBLE : RAQUETTE)"],
+   ["PYO JEUK TCHAGUI","*(UNE CIBLE OU SA MAIN)"],
+   ["DWIT BAL KOUROH FOULYEU TCHAGUI"]],
+  [["*AP KOUBI SEUGUI","OWE SAN TEUL MAKI","YOP TCHAGUI","*AP KOUBI SEUGUI","PALKOUP PYOJOK TCHIGUI"],
+   ["*AP KOUBI SEUGUI","KAOUI MAKI","AP TCHAGUI","*AP KOUBI SEUGUI","DANG KYEU TEUK JILEUGUI"],
+   ["*AP KOUBI SEUGUI","PYON SON KEUT ARE JETCHEU TCHIREUGUI","YOP TCHAGUI","PALKOUP DOLYEU TCHIGUI"],
+   ["*DWITT KOUBI SEUGUI","SONNAL MOMTONG MAKI","KEUDEUP YOP TCHAGUI","*AP KOUBI SEUGUI","A GUI SON CALJAEBI"],
+   ["*AP KOUBI SEUGUI","MONTONG HETCHEU MAKI","AP TCHAGUI","*AP KOUBI SEUGUI","MOUROUP KOKKI"],
+   ["*DWITT KOUBI SEUGUI","KEUDEURO MOMTONG BAKKAT MAKI","DOLYEU TCHAGUI","*AP KOUBI SEUGUI","A GUI SON CALJAEBI"],
+   ["*AP KOUBI SEUGUI","HAN SONNAL ARE MAKI","A GUI SON CALJAEBI","DOU BAL DANG SANG AP TCHAGUI","*AP KOUBI SEUGUI","ME JOUMOK NELYEU TCHIGUI"],
+   ["*DWITT KOUBI SEUGUI","KEUDEURO ARE MAKI","AP TCHAGUI","*AP KOUBI SEUGUI","MOMTONG DOUBONN JILEUGUI"]]
+ ]
+};
+
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
+const danTxt=d=>d==1?"1er DAN":"2È DAN";
+let dan=1, players=1, player=0, step=0, revealed=false, pools=[[],[],[]], drawn=[];
+
+try{const s=JSON.parse(localStorage.getItem("kibon")||"{}");if(s.dan)dan=s.dan;if(s.players)players=s.players}catch(e){}
+const save=()=>{try{localStorage.setItem("kibon",JSON.stringify({dan,players}))}catch(e){}};
+
+function show(id){document.querySelectorAll(".screen").forEach(s=>s.classList.toggle("on",s.id===id));window.scrollTo(0,0)}
+function syncHome(){
+  document.querySelectorAll(".dan").forEach(b=>b.setAttribute("aria-pressed",String(b.dataset.dan==dan)));
+  $("nb").textContent=players;$("minus").disabled=players<=1;$("plus").disabled=players>=8;
+}
+function renderCats(){
+  $("cats").innerHTML=CATS[dan].map((c,i)=>`<div><i style="background:${c.c}">${i+1}</i><span>${SHORT[i]} <span class="meta">— 2 cartes</span></span></div>`).join("");
+}
+// Hasard robuste : crypto si dispo, sinon générateur xorshift amorcé sur l'heure + compteur
+let seed=(Date.now()^(performance.now()*1000))>>>0||1;
+function rnd(n){
+  try{if(window.crypto&&crypto.getRandomValues){const a=new Uint32Array(1);crypto.getRandomValues(a);return a[0]%n}}catch(e){}
+  seed^=seed<<13;seed>>>=0;seed^=seed>>>17;seed^=seed<<5;seed>>>=0;
+  seed=(seed+(Date.now()&0xffff))>>>0;
+  return Math.floor(((seed/4294967296)+Math.random())%1*n);
+}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=rnd(i+1);[a[i],a[j]]=[a[j],a[i]]}return a}
+// Cartes de la partie précédente : remises en fond de paquet pour varier d'une partie à l'autre
+let prev={};
+try{prev=JSON.parse(localStorage.getItem("kibon-prev")||"{}")}catch(e){}
+function drawFrom(cat){
+  if(!pools[cat].length){
+    const last=drawn.length?drawn[drawn.length-1]:null;
+    const old=(prev[dan]&&prev[dan][cat])||[];
+    const fresh=shuffle([...Array(8).keys()].filter(x=>!old.includes(x)));
+    pools[cat]=shuffle(old.slice()).concat(fresh);
+    if(last&&last.cat===cat&&pools[cat][pools[cat].length-1]===last.n&&pools[cat].length>1){const p=pools[cat];[p[0],p[p.length-1]]=[p[p.length-1],p[0]]}
+  }
+  return pools[cat].pop();
+}
+const catOf=s=>Math.floor(s/2);
+
+function renderTrack(){
+  $("track").innerHTML=[0,1,2,3,4,5].map(i=>{
+    const c=CATS[dan][catOf(i)].c;
+    const cls=i<step||(i===step&&revealed)?"done":i===step?"now":"";
+    return `<span class="${cls}" style="--c:${c}" title="${SHORT[catOf(i)]}"></span>`}).join("");
+}
+function renderTurn(){
+  $("who").textContent=players>1?`Joueur ${player+1} / ${players}`:"À vous de jouer";
+  $("meta").textContent=`Carte ${step+1} / 6 · ${SHORT[catOf(step)]}`;
+  $("back-d").textContent=`${danTxt(dan)} · ${SHORT[catOf(step)]}`;
+  $("act").textContent="Tirer la carte";
+  renderTrack();
+}
+function reveal(){
+  const cat=catOf(step), n=drawFrom(cat), items=DECK[dan][cat][n];
+  drawn.push({p:player,cat,n});
+  const c=CATS[dan][cat];
+  document.querySelector(".front").style.setProperty("--c",c.c);
+  $("f-mod").textContent=`MODULE A - KIBON - ${danTxt(dan)}`;
+  $("f-cat").textContent=c.name;
+  const t=$("f-title");t.textContent=`${n+1}. ${cat===1?"KYORUGUI ":""}TCHOUMBI SEUGUI`;t.classList.toggle("small",cat===1);
+  $("f-items").innerHTML=items.map(x=>x[0]==="*"?`<li class="p"><span>${esc(x.slice(1))}</span></li>`:`<li><span>${esc(x)}</span></li>`).join("");
+  $("card").classList.add("up");revealed=true;
+  const last=step===5;
+  $("act").textContent=last?(player<players-1?"Joueur suivant":"Terminer"):"Carte suivante";
+  renderTrack();
+}
+function next(){
+  $("card").classList.remove("up");revealed=false;
+  if(step<5){step++;setTimeout(renderTurn,250);return}
+  if(player<players-1){player++;step=0;setTimeout(renderTurn,250);return}
+  end();
+}
+function end(){
+  $("end-t").textContent="Bravo, partie terminée !";
+  $("end-s").textContent=`${danTxt(dan)} · ${players} joueur${players>1?"s":""} · ${drawn.length} enchaînements réalisés.`;
+  $("end-list").innerHTML=Array.from({length:players},(_,p)=>{
+    const mine=drawn.filter(d=>d.p===p).map(d=>`C${d.cat+1}·${d.n+1}`).join("  ");
+    return `<li><span>${players>1?"Joueur "+(p+1):"Vos cartes"}</span><i>${mine}</i></li>`}).join("");
+  show("s-end");
+}
+function savePrev(){
+  if(!drawn.length)return;
+  prev[dan]=[0,1,2].map(c=>drawn.filter(d=>d.cat===c).map(d=>d.n));
+  try{localStorage.setItem("kibon-prev",JSON.stringify(prev))}catch(e){}
+}
+function start(){
+  savePrev();
+  pools=[[],[],[]];drawn=[];player=0;step=0;revealed=false;
+  $("card").classList.remove("up");renderTurn();show("s-game");
+}
+
+document.querySelectorAll(".dan").forEach(b=>b.addEventListener("click",()=>{dan=+b.dataset.dan;save();syncHome()}));
+$("minus").addEventListener("click",()=>{if(players>1)players--;save();syncHome()});
+$("plus").addEventListener("click",()=>{if(players<8)players++;save();syncHome()});
+$("go-rules").addEventListener("click",()=>{renderCats();show("s-rules")});
+$("back-home").addEventListener("click",()=>show("s-home"));
+$("start").addEventListener("click",start);
+$("act").addEventListener("click",()=>revealed?next():reveal());
+$("card").addEventListener("click",()=>{if(!revealed)reveal()});
+$("quit").addEventListener("click",()=>show("s-home"));
+$("again").addEventListener("click",()=>{renderCats();show("s-rules")});
+$("home").addEventListener("click",()=>show("s-home"));
+document.addEventListener("keydown",e=>{
+  if(!$("s-game").classList.contains("on"))return;
+  if(e.code==="Space"||e.code==="Enter"){if(document.activeElement&&document.activeElement.tagName==="BUTTON")return;e.preventDefault();revealed?next():reveal()}
+});
+syncHome();
+}
+</script>
+</body>
+</html>
